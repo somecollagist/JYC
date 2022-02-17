@@ -20,6 +20,11 @@ public static partial class Engine
 	public static int ScreenHeight { get; private set; } = 0;
 
 	/// <summary>
+	/// Render Buffer for low level drawing to the console
+	/// </summary>
+	public static RenderBuffer RenderBuffer { get; private set; }
+
+	/// <summary>
 	/// Runs setup for the engine.
 	/// </summary>
 	/// <param name="info">The game's metadata, which can be displayed.</param>
@@ -29,7 +34,9 @@ public static partial class Engine
 		Console.WriteLine("Please resize this window to something you're happy with, then press any key to continue...");
 		Console.ReadKey();
 
-		ScreenHeight = Console.BufferHeight;
-		ScreenWidth = Console.BufferWidth;
+		ScreenHeight = Console.WindowHeight;
+		ScreenWidth = Console.WindowWidth;
+
+		RenderBuffer = new RenderBuffer(ScreenWidth, ScreenHeight);
 	}
 }
