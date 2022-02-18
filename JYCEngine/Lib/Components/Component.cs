@@ -15,4 +15,6 @@ public class Component
 	/// </summary>
 	/// <remarks>If this is false, functions will return nothing when using this component</remarks>
 	public bool IsActive { get; set; } = true;
+
+	public virtual void Update(){}
 }

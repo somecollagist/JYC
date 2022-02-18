@@ -25,7 +25,7 @@ public class Entity
 	private protected void RegisterNewComponent(string alias, Component component, bool useGuid = true)
 	{
 		if(useGuid) alias += this.ID;
-		Engine.Components.Add(alias, component);
+		Engine.AddComponent(alias, component);
 		Components.Add(alias);
 	}
 

@@ -4,42 +4,92 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace JYCEngine.Engine
+namespace JYCEngine;
+
+/// <summary>
+/// Provides an abstraction layer to access the Console's raw output stream
+/// via a buffer
+/// </summary>
+public class RenderBuffer
 {
     /// <summary>
-    /// Class to store data to be shown on the console window
+    /// Width of a row of text at the current resolution.
     /// </summary>
-    public class RenderBuffer
+    public readonly int Width;
+    /// <summary>
+    /// How many rows of text can be displayed at the current resolution.
+    /// </summary>
+    public readonly int Height;
+
+    /// <summary>
+    /// Buffer array stored as 1D byte array for performance
+    /// </summary>
+    private byte[] buffer;
+
+    /// <summary>
+    /// Raw output stream for the console
+    /// </summary>
+    private Stream outputStream;
+
+    public RenderBuffer(int width, int height)
     {
-        public readonly int Width;
-        public readonly int Height;
+        Width = width;
+        Height = height;
+        buffer = new byte[Width * Height];
+        ClearBuffer();
+        outputStream = Console.OpenStandardOutput();
+    }
 
-        public readonly int BufferCount;
+    /// <summary>
+    /// Set an individual character at a position on the screen
+    /// </summary>
+    /// <param name="x"></param>
+    /// <param name="y"></param>
+    /// <param name="c"></param>
+    public void SetCharacter(int x, int y, char c)
+    {
+        buffer[y * Width + x] = (byte)c;
+    }
 
-        private char[] buffer;
-        private Stream outputStream;
+    /// <summary>
+    /// Set a 2d chunk of characters at a position on the screen
+    /// </summary>
+    /// <param name="x">X Position</param>
+    /// <param name="y">Y Position</param>
+    /// <param name="chars">2D array of characters to set</param>
+    /// <param name="includeSpace">Boolean flag for whether to override with space characters</param>
+    public void SetCharacters(int x, int y, char[,] chars, bool includeSpace = false)
+    {
+        for (int fy = 0; fy < chars.GetLength(0); fy++)
+            for (int fx = 0; fx < chars.GetLength(1); fx++)
+                if (includeSpace || chars[fx, fy] != ' ')
+                    buffer[(y+fy) * Width + (x + fx)] = (byte)chars[fx, fy];
+    }
 
-        public RenderBuffer(int width, int height, int bufferCount = 2)
-        {
-            Width = width;
-            Height = height;
-            BufferCount = bufferCount;
+    /// <summary>
+    /// Push the buffer to the screen
+    /// </summary>
+    public void Blit()
+    {
+        Console.SetCursorPosition(0, 0);
+        outputStream.Write(buffer, 0, Width * Height);
+        outputStream.Flush();
+    }
 
-            buffer = new char[height * width];
+    /// <summary>
+    /// Clear the buffer
+    /// </summary>
+    public void ClearBuffer()
+    {
+        Fill(' ');
+    }
 
-            outputStream = Console.OpenStandardOutput();
-        }
-
-        public void Blit()
-        {
-            outputStream.Seek(0, SeekOrigin.Begin);
-            for (int y = 0; y < Height; y++)
-            {
-                for (int x = 0; x < Width; x++)
-                {
-                    outputStream.Write()
-                }
-            }
-        }
+    /// <summary>
+    /// Fill the buffer with a character
+    /// </summary>
+    /// <param name="c">Character to fill with</param>
+    public void Fill(char c)
+    {
+        for (int i = 0; i < buffer.Length; i++) buffer[i] = (byte)c;
     }
 }

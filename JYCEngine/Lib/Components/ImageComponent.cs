@@ -1,13 +1,11 @@
 using System;
-using System.Collections.Generic;
-
 using JYCEngine;
 
 namespace JYCEngine.StdLib;
 
-public class ImageComponent : Component
+public sealed class ImageComponent : Component
 {
-	public char[,] Image { get; private set; } = new char[0, 0];
+	public char[,] Image { get; set; } = new char[0, 0];
 
 	public void LoadImageFromCharArray(char[,] img)
 	{
