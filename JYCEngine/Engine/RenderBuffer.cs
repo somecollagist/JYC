@@ -38,6 +38,7 @@ public class RenderBuffer
         buffer = new byte[Width * Height];
         ClearBuffer();
         outputStream = Console.OpenStandardOutput();
+        Console.CursorVisible = false;
     }
 
     /// <summary>
@@ -60,6 +61,8 @@ public class RenderBuffer
     /// <param name="includeSpace">Boolean flag for whether to override with space characters</param>
     public void SetCharacters(int x, int y, char[,] chars, bool includeSpace = false)
     {
+        if (chars == null) return;
+
         for (int fy = 0; fy < chars.GetLength(0); fy++)
             for (int fx = 0; fx < chars.GetLength(1); fx++)
                 if (includeSpace || chars[fx, fy] != ' ')

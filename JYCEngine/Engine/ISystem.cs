@@ -8,5 +8,6 @@ namespace JYCEngine;
 
 public interface ISystem
 {
-    public void Execute(double deltaTime);
+    public void Init(EcsWorld world);
+    public void Execute();
 }
