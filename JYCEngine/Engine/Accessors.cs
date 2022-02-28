@@ -120,4 +120,6 @@ public static partial class Engine
 	{
 		return GetComponentsByComponentPredicate<T>(t => t.GetType() == typeof(T));
 	}
+
+	public static IEnumerable<Entity> With<T>(this IEnumerable<Entity> entities) where T : Component => entities.Where(e => e.Components.Any(name => Components[name] is T));
 }

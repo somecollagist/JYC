@@ -12,8 +12,16 @@ public static partial class Engine
 	public static Dictionary<string, Component> Components { get; internal set; } = new();
 
 	/// <summary>
-<<<<<<< HEAD
-=======
+	/// Stores all the entities used by the game.
+	/// </summary>
+	public static List<Entity> Entities { get; internal set; } = new();
+
+	/// <summary>
+	/// Stores all the registered systems used by the game.
+	/// </summary>
+	public static List<ISystem> Systems { get; internal set; } = new();
+
+	/// <summary>
 	/// Width of a row of text at the current resolution.
 	/// </summary>
 	public static int ScreenWidth { get; private set; } = 0;
@@ -28,10 +36,6 @@ public static partial class Engine
 	public static RenderBuffer RenderBuffer { get; private set; }
 
 	/// <summary>
-<<<<<<< Updated upstream
-=======
->>>>>>> e2b9cc5bbc83a5c459a502fd8b5fb7533cdb4db4
->>>>>>> Stashed changes
 	/// Runs setup for the engine.
 	/// </summary>
 	/// <param name="info">The game's metadata, which can be displayed.</param>
@@ -41,9 +45,18 @@ public static partial class Engine
 		Console.WriteLine("Please resize this window to something you're happy with, then press any key to continue...");
 		Console.ReadKey();
 
-<<<<<<< Updated upstream
-=======
-<<<<<<< HEAD
+		ScreenHeight = Console.WindowHeight;
+		ScreenWidth = Console.WindowWidth;
+
+		RenderBuffer = new RenderBuffer(ScreenWidth, ScreenHeight);
+
+		Systems.Add(new StdLib.RenderingSystem());
+
+		while (true)
+        {
+			await Tick();
+        }
+		/*
 		Renderer.Init(24);
 
 		while(true)
@@ -55,15 +68,13 @@ public static partial class Engine
 				component.Update();
 			}
 		}
-=======
->>>>>>> Stashed changes
-		ScreenHeight = Console.WindowHeight;
-		ScreenWidth = Console.WindowWidth;
+		*/
+	}
 
-		RenderBuffer = new RenderBuffer(ScreenWidth, ScreenHeight);
-<<<<<<< Updated upstream
-=======
->>>>>>> e2b9cc5bbc83a5c459a502fd8b5fb7533cdb4db4
->>>>>>> Stashed changes
+	private static Task Tick()
+    {
+		Systems.ForEach(x => x.Execute(0f)); // Replace 0f with time since last frame
+		System.Threading.Thread.Sleep(1000 / 30); // 30 FPS
+		return Task.CompletedTask;
 	}
 }

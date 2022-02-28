@@ -17,6 +17,21 @@ public class Entity
 	public List<string> Components { get; private set; } = new();
 
 	/// <summary>
+	/// Gets the first component of a certain type on an entity
+	/// </summary>
+	/// <typeparam name="T">The type to get</typeparam>
+	/// <returns></returns>
+	public T GetFirstComponent<T>() where T : Component
+    {
+		foreach (var component in Components)
+        {
+			if (Engine.Components[component] is T)
+				return (T)Engine.Components[component];
+        }
+		return null;
+    }
+
+	/// <summary>
 	/// Registers a new component to the master component registry and this entity.
 	/// </summary>
 	/// <param name="alias">Alias of component to register.</param>

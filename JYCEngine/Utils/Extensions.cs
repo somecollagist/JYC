@@ -5,4 +5,12 @@ public static class Extensions
 	{
 		return Engine.GetComponentByAlias<T>(alias + entity.ID);
 	}
+
+	public static void ForEach<T>(this IEnumerable<T> enumerable, Action<T> action)
+    {
+		foreach (var element in enumerable)
+        {
+			action?.Invoke(element);
+        }
+    }
 }
