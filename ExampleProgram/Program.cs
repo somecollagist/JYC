@@ -1,44 +1,62 @@
 ﻿using JYCEngine;
 using JYCEngine.StdLib;
 
-Engine.TargetFramerate = 35;
+Engine.TargetFramerate = 20000;
+Engine.TimeScale = 1f;
 
 EcsWorld world = new EcsWorld();
 Systems systems = new Systems(world)
     .Add(new AnimationSystem())
+    .Add(new PhysicsSystem())
+    .Add(new ColliderDebugSystem())
     .Add(new RenderSystem());
 systems.Init();
-
 Engine.Tick += systems.Execute;
+Engine.Init();
 
-// Create stuff
+var camera = world.CreateEntity()
+    .Replace(new CameraComponent(Engine.RenderBuffer))
+    .Replace(new PositionComponent() { position = Vector2.Zero })
+    .Replace(new VelocityComponent());
+
+Input.RegisterBinding('w', () => camera.Get<VelocityComponent>().velocity += Vector2.Up * 1f);
+Input.RegisterBinding('a', () => camera.Get<VelocityComponent>().velocity += Vector2.Left * 1f);
+Input.RegisterBinding('s', () => camera.Get<VelocityComponent>().velocity += Vector2.Down * 1f);
+Input.RegisterBinding('d', () => camera.Get<VelocityComponent>().velocity += Vector2.Right * 1f);
+
+var triangle = new List<Vector2>() { new Vector2(-1, 0), new Vector2(1, 1), new Vector2(1, -1) };
+var square = new List<Vector2>() { new Vector2(-1, -1), new Vector2(-1, 1), new Vector2(1, 1), new Vector2(1, -1) };
+
 Random rand = new Random();
-for (int i = 0; i < 10; i++)
+Vector2 RandomVector(float size) => new Vector2((rand.NextSingle() * 2 - 1) * size, (rand.NextSingle() * 2 - 1) * size);
+
+CreateStaticShape(new Vector2(-120, 0), 65, square);
+CreateStaticShape(new Vector2(120, 0), 65, square);
+CreateStaticShape(new Vector2(0, 120), 65, square);
+CreateStaticShape(new Vector2(0, -120), 65, square);
+for (int i = 0; i < 5; i++)
 {
-    var entity = world.CreateEntity()
-        .Replace(new PositionComponent() { x = Console.WindowWidth / 2 - 20 + i * 4, y = Console.WindowHeight / 2 - 10 + i * 2 })
-        .Replace(new ImageComponent())
-        .Replace(new AnimationComponent());
-    ref AnimationComponent animation = ref entity.Get<AnimationComponent>();
-    animation.frames = new List<AnimationFrame>();
-    int frame = 0;
-    foreach (char c in " .-~=&#@#&=~-.")
-    {
-        char[,] chars = new char[3, 3];
-        for (int x = 0; x < 3; x++)
-        {
-            for (int y = 0; y < 3; y++)
-            {
-                chars[x, y] = c;
-            }
-        }
-        animation.frames.Add(new AnimationFrame() { chars = chars, frame = frame });
-        //frame += rand.Next(3, 10);
-        frame++;
-    }
-    animation.frameCount = frame;
-    animation.framerate = 20;
+    CreateShape(RandomVector(20), rand.Next(3, 8), RandomVector(5), (rand.NextSingle() * 2 - 1) * 120, square);
+    CreateShape(RandomVector(20), rand.Next(3, 8), RandomVector(5), (rand.NextSingle() * 2 - 1) * 120, triangle);
 }
 
-Engine.Init();
+void CreateShape(Vector2 position, int scale, Vector2 velocity, float angularVelocity, List<Vector2> points)
+{
+    var shape = world.CreateEntity()
+        .Replace(new PositionComponent() { position = position })
+        .Replace(new VelocityComponent() { velocity = velocity, angularVelocity = angularVelocity })
+        .Replace(new ImageComponent())
+        .Replace(new Collider2DComponent() { points = points.Select(x => x * scale).ToList(), closed = true });
+    shape.Get<Collider2DComponent>().RecalculateBounds();
+}
+
+void CreateStaticShape(Vector2 position, int scale, List<Vector2> points)
+{
+    var shape = world.CreateEntity()
+        .Replace(new PositionComponent() { position = position })
+        .Replace(new ImageComponent())
+        .Replace(new Collider2DComponent() { points = points.Select(x => x * scale).ToList(), closed = true });
+    shape.Get<Collider2DComponent>().RecalculateBounds();
+}
+
 Engine.Run();

@@ -2,6 +2,5 @@
 
 public struct PositionComponent
 {
-    public int x;
-    public int y;
+    public Vector2 position;
 }

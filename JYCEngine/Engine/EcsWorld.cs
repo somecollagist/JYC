@@ -40,6 +40,18 @@ public class EcsWorld
         return entity;
     }
 
+    public Entity CopyEntity(Entity original)
+    {
+        Entity entity = CreateEntity();
+
+        foreach (var component in original.Components)
+        {
+            entity.Replace(ComponentPools[component.Key].Get(component.Value));
+        }
+
+        return entity;
+    }
+
     public Filter CreateFilter()
     {
         Filter filter = new Filter(this);

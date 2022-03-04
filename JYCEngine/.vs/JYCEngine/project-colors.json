@@ -5,7 +5,42 @@
       "ProjectGuid": "d63e27da-3d63-4f4e-8ff5-c389f14f3adf",
       "DisplayName": "JYCEngine",
       "ColorIndex": 0
+    },
+    "6cc122a8-7578-4d69-b021-6a16251e71b9": {
+      "ProjectGuid": "6cc122a8-7578-4d69-b021-6a16251e71b9",
+      "DisplayName": "JYCEngine",
+      "ColorIndex": 1
+    },
+    "b75c4218-326d-4692-a857-f751bbf896f3": {
+      "ProjectGuid": "b75c4218-326d-4692-a857-f751bbf896f3",
+      "DisplayName": "JYCEngine",
+      "ColorIndex": 2
+    },
+    "3ce9ca48-8802-4f64-94ab-72eea8fd518c": {
+      "ProjectGuid": "3ce9ca48-8802-4f64-94ab-72eea8fd518c",
+      "DisplayName": "ExampleProgram",
+      "ColorIndex": 3
+    },
+    "0fcd5f89-0294-449a-92d2-9a2a1b33761d": {
+      "ProjectGuid": "0fcd5f89-0294-449a-92d2-9a2a1b33761d",
+      "DisplayName": "JYCEngine",
+      "ColorIndex": 4
+    },
+    "4eed309c-872a-4b2f-94ab-8b7c16e9c5eb": {
+      "ProjectGuid": "4eed309c-872a-4b2f-94ab-8b7c16e9c5eb",
+      "DisplayName": "ExampleProgram",
+      "ColorIndex": 5
+    },
+    "202af51e-1ed4-4f4b-b539-23387fa1a35c": {
+      "ProjectGuid": "202af51e-1ed4-4f4b-b539-23387fa1a35c",
+      "DisplayName": "JYCEngine",
+      "ColorIndex": 6
+    },
+    "908879c7-f073-4a99-9dac-f1f01066261c": {
+      "ProjectGuid": "908879c7-f073-4a99-9dac-f1f01066261c",
+      "DisplayName": "ExampleProgram",
+      "ColorIndex": 7
     }
   },
-  "NextColorIndex": 1
+  "NextColorIndex": 8
 }

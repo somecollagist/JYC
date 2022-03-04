@@ -33,9 +33,9 @@ public class RenderBuffer
 
     public RenderBuffer(int width, int height)
     {
-        Width = width;
+        Width = width / 2;
         Height = height;
-        buffer = new byte[Width * Height];
+        buffer = new byte[Width * Height * 2];
         ClearBuffer();
         outputStream = Console.OpenStandardOutput();
         Console.CursorVisible = false;
@@ -49,7 +49,9 @@ public class RenderBuffer
     /// <param name="c"></param>
     public void SetCharacter(int x, int y, char c)
     {
-        buffer[y * Width + x] = (byte)c;
+        if (!InBounds(x, Height - 1 - y)) return;
+        int i = (Height - 1 - y) * (Width * 2) + x * 2;
+        buffer[i] = (byte)c;
     }
 
     /// <summary>
@@ -63,11 +65,34 @@ public class RenderBuffer
     {
         if (chars == null) return;
 
-        for (int fy = 0; fy < chars.GetLength(0); fy++)
-            for (int fx = 0; fx < chars.GetLength(1); fx++)
-                if (includeSpace || chars[fx, fy] != ' ')
-                    buffer[(y+fy) * Width + (x + fx)] = (byte)chars[fx, fy];
+        for (int fy = 0; fy < chars.GetLength(1); fy++)
+        {
+            for (int fx = 0; fx < chars.GetLength(0); fx++)
+            {
+                if (InBounds(x + fx, Height - 1 - (y + fy)) && (includeSpace || (chars[fx, fy] != ' ' && chars[fx, fy] != '\0')))
+                {
+                    int i = (Height - 1 - (y + fy)) * (Width * 2) + (x + fx) * 2;
+                    buffer[i] = (byte)chars[fx, fy];
+                }
+            }
+        }
     }
+
+    public void PrintString(int x, int y, string str)
+    {
+        for (int i = 0; i < str.Length; i++)
+        {
+            SetCharacter(x + i, y, str[i]);
+        }
+    }
+
+    /// <summary>
+    /// Check whether a given pixel is inside the console bounds
+    /// </summary>
+    /// <param name="x">X Position</param>
+    /// <param name="y">Y Position</param>
+    /// <returns></returns>
+    public bool InBounds(int x, int y) => 0 <= x && x < Width && 0 <= y && y < Height;
 
     /// <summary>
     /// Push the buffer to the screen
@@ -75,7 +100,7 @@ public class RenderBuffer
     public void Blit()
     {
         Console.SetCursorPosition(0, 0);
-        outputStream.Write(buffer, 0, Width * Height);
+        outputStream.Write(buffer, 0, Width * Height * 2);
         outputStream.Flush();
     }
 

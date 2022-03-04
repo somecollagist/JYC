@@ -48,5 +48,10 @@ public static class EntityExtensions
 
         return entity;
     }
+
+    public static bool Has<T>(this Entity entity)
+    {
+        return entity.Components.ContainsKey(typeof(T));
+    }
 }
 

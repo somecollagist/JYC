@@ -11,8 +11,11 @@ public static class Engine
 {
     public static RenderBuffer RenderBuffer { get; private set; }
     public static Action Tick { get; set; }
-    public static float DeltaTime { get; private set; }
     public static int TargetFramerate { get; set; } = 30;
+    public static float TimeScale { get; set; } = 1f;
+
+    private static float _deltaTime;
+    public static float DeltaTime => _deltaTime * TimeScale;
 
     public static void Init()
     {
@@ -24,11 +27,12 @@ public static class Engine
 
     public static void Run()
     {
-        DeltaTime = 0;
+        _deltaTime = 0;
         while (true)
         {
             long time = Stopwatch.GetTimestamp();
 
+            Input.Run();
             Tick?.Invoke();
 
             float frametime = (float)(Stopwatch.GetTimestamp() - time) / Stopwatch.Frequency;
@@ -36,7 +40,7 @@ public static class Engine
             if (waitTime > 0)
                 Thread.Sleep(waitTime);
 
-            DeltaTime = (float)(Stopwatch.GetTimestamp() - time) / Stopwatch.Frequency;
+            _deltaTime = (float)(Stopwatch.GetTimestamp() - time) / Stopwatch.Frequency;
 
 #if DEBUG
             string framerateString = ((int)(1f / DeltaTime)).ToString();
