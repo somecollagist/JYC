@@ -1,5 +1,6 @@
 ﻿namespace JYCEngine.StdLib;
 
+[RequireComponents(typeof(ImageComponent))]
 public struct AnimationComponent
 {
     public float framerate;

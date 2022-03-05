@@ -12,11 +12,15 @@ public class EcsWorld
     public Dictionary<Type, IPool> ComponentPools;
     public List<Filter> Filters;
 
+    private Dictionary<Type, Type[]> _componentDependencyTable;
+
     public EcsWorld()
     {
         Entities = new();
         ComponentPools = new();
         Filters = new();
+
+        _componentDependencyTable = new();
     }
 
     public void UpdateFilters(Entity entity)
@@ -71,5 +75,55 @@ public class EcsWorld
     public void DestroyComponent(Type type, int id)
     {
         ComponentPools[type].Recycle(id);
+    }
+
+    public void AddComponentToEntity<T>(Entity entity, T component)
+    {
+        int id = ComponentPools[typeof(T)].Reserve();
+        ComponentPools[typeof(T)].Set(id, component);
+        entity.Components.Add(typeof(T), id);
+        var requiredComponents = _componentDependencyTable[typeof(T)];
+        if (requiredComponents.Length > 0)
+        {
+            foreach (var type in requiredComponents)
+            {
+                if (!entity.Components.ContainsKey(type))
+                    AddComponentToEntity(entity, Convert.ChangeType(Activator.CreateInstance(type), type), type);
+            }
+        }
+        UpdateFilters(entity);
+    }
+
+    public void AddComponentToEntity(Entity entity, object component, Type componentType)
+    {
+        int id = ComponentPools[componentType].Reserve();
+        ComponentPools[componentType].Set(id, component);
+        entity.Components.Add(componentType, id);
+        var requiredComponents = _componentDependencyTable[componentType];
+        if (requiredComponents.Length > 0)
+        {
+            foreach (var type in requiredComponents)
+            {
+                if (!entity.Components.ContainsKey(type))
+                    AddComponentToEntity(entity, Convert.ChangeType(Activator.CreateInstance(type), type));
+            }
+        }
+        UpdateFilters(entity);
+    }
+
+    public void RegisterNewComponent<T>()
+    {
+        ComponentPools.Add(typeof(T), new Pool<T>());
+
+        Console.WriteLine($"Registered {typeof(T)}");
+        var attributes = typeof(T).GetCustomAttributes(typeof(RequireComponentsAttribute), false);
+        if (attributes.Length > 0)
+            _componentDependencyTable.Add(typeof(T), ((RequireComponentsAttribute)attributes.ToArray()[0]).Types); // Extra type data from attribute
+        else
+            _componentDependencyTable.Add(typeof(T), new Type[0]); // Empty array
+        foreach (var type in _componentDependencyTable[typeof(T)])
+        {
+            Console.WriteLine($" - {type}");
+        }
     }
 }

@@ -14,7 +14,7 @@ public static class EntityExtensions
         if (!entity.Components.ContainsKey(typeof(T)))
         {
             if (!entity.Owner.ComponentPools.ContainsKey(typeof(T)))
-                entity.Owner.ComponentPools.Add(typeof(T), new Pool<T>());
+                entity.Owner.RegisterNewComponent<T>();
             entity.Components.Add(typeof(T), entity.Owner.ComponentPools[typeof(T)].Reserve());
             entity.Owner.UpdateFilters(entity);
         }
@@ -28,11 +28,8 @@ public static class EntityExtensions
         else
         {
             if (!entity.Owner.ComponentPools.ContainsKey(typeof(T)))
-                entity.Owner.ComponentPools.Add(typeof(T), new Pool<T>());
-            int id = entity.Owner.ComponentPools[typeof(T)].Reserve();
-            entity.Owner.ComponentPools[typeof(T)].Set(id, component);
-            entity.Components.Add(typeof(T), id);
-            entity.Owner.UpdateFilters(entity);
+                entity.Owner.RegisterNewComponent<T>();
+            entity.Owner.AddComponentToEntity(entity, component);
         }
         return entity;
     }
@@ -49,7 +46,7 @@ public static class EntityExtensions
         return entity;
     }
 
-    public static bool Has<T>(this Entity entity)
+    public static bool Has<T>(this Entity entity) where T : struct
     {
         return entity.Components.ContainsKey(typeof(T));
     }

@@ -59,4 +59,10 @@ void CreateStaticShape(Vector2 position, int scale, List<Vector2> points)
     shape.Get<Collider2DComponent>().RecalculateBounds();
 }
 
-Engine.Run();
+var animatedTest = world.CreateEntity()
+    .Replace(new AnimationComponent() { });
+Engine.RenderBuffer.PrintString(1, 2, animatedTest.Has<PositionComponent>().ToString());
+Engine.RenderBuffer.PrintString(1, 1, animatedTest.Has<ImageComponent>().ToString());
+//Engine.RenderBuffer.Blit();
+
+//Engine.Run();
