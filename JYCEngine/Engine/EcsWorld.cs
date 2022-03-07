@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -88,24 +90,11 @@ public class EcsWorld
             foreach (var type in requiredComponents)
             {
                 if (!entity.Components.ContainsKey(type))
-                    AddComponentToEntity(entity, Convert.ChangeType(Activator.CreateInstance(type), type), type);
-            }
-        }
-        UpdateFilters(entity);
-    }
-
-    public void AddComponentToEntity(Entity entity, object component, Type componentType)
-    {
-        int id = ComponentPools[componentType].Reserve();
-        ComponentPools[componentType].Set(id, component);
-        entity.Components.Add(componentType, id);
-        var requiredComponents = _componentDependencyTable[componentType];
-        if (requiredComponents.Length > 0)
-        {
-            foreach (var type in requiredComponents)
-            {
-                if (!entity.Components.ContainsKey(type))
-                    AddComponentToEntity(entity, Convert.ChangeType(Activator.CreateInstance(type), type));
+                {
+                    if (!ComponentPools.ContainsKey(type))
+                        CreateGeneric(GetType().GetMethod(nameof(RegisterNewComponent)), type).Invoke(this, null);
+                    CreateGeneric(GetType().GetMethod(nameof(AddComponentToEntity)), type).Invoke(this, new object[] { entity, Convert.ChangeType(Activator.CreateInstance(type), type) });
+                }
             }
         }
         UpdateFilters(entity);
@@ -115,15 +104,15 @@ public class EcsWorld
     {
         ComponentPools.Add(typeof(T), new Pool<T>());
 
-        Console.WriteLine($"Registered {typeof(T)}");
         var attributes = typeof(T).GetCustomAttributes(typeof(RequireComponentsAttribute), false);
         if (attributes.Length > 0)
             _componentDependencyTable.Add(typeof(T), ((RequireComponentsAttribute)attributes.ToArray()[0]).Types); // Extra type data from attribute
         else
             _componentDependencyTable.Add(typeof(T), new Type[0]); // Empty array
-        foreach (var type in _componentDependencyTable[typeof(T)])
-        {
-            Console.WriteLine($" - {type}");
-        }
+    }
+
+    MethodInfo CreateGeneric(MethodInfo info, Type type)
+    {
+        return info.MakeGenericMethod(type);
     }
 }
