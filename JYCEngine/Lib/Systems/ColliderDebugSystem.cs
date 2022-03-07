@@ -13,7 +13,6 @@ public struct ColliderDebugSystem : ISystem
     public void Init(EcsWorld world)
     {
         _filter = world.CreateFilter()
-            .Require<PositionComponent>()
             .Require<Collider2DComponent>()
             .Require<ImageComponent>();
     }
@@ -22,17 +21,17 @@ public struct ColliderDebugSystem : ISystem
     {
         foreach (var entity in _filter.Matches())
         {
-            var position = entity.Get<PositionComponent>().position;
             ref var collider = ref entity.Get<Collider2DComponent>();
             ref var image = ref entity.Get<ImageComponent>();
 
+            // Draw lines
             List<(int x, int y, char c)> imagePoints = new List<(int x, int y, char c)>();
-
 
             for (int i = 0; i < collider.points.Count - 1; i++)
                 DrawLine(imagePoints, collider.points[i], collider.points[i + 1]);
             if (collider.closed) DrawLine(imagePoints, collider.points[^1], collider.points[0]);
 
+            // Calculate image bounds
             int minX = imagePoints[0].x;
             int minY = imagePoints[0].y;
             int maxX = imagePoints[0].x;
@@ -47,16 +46,20 @@ public struct ColliderDebugSystem : ISystem
             int sizeX = maxX - minX + 1;
             int sizeY = maxY - minY + 1;
 
+            // Set 'pixels' in image
             image.chars = new char[sizeX, sizeY];
 
             foreach (var point in imagePoints)
             {
                 image.chars[point.x - minX, point.y - minY] = point.c;
             }
+            // Set image pivot
             image.pivot = new Vector2(-minX, -minY);
         }
     }
 
+    // Helper method for drawing a line
+    // Might be useful to move to some kind of static helper class for drawing primitives
     void DrawLine(List<(int x, int y, char c)> image, Vector2 from, Vector2 to)
     {
         float xdiff = Math.Abs(from.x - to.x);

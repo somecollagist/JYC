@@ -9,13 +9,13 @@ namespace JYCEngine;
 
 public static class Engine
 {
-    public static RenderBuffer RenderBuffer { get; private set; }
-    public static Action Tick { get; set; }
+    public static RenderBuffer RenderBuffer { get; private set; } // Abstraction layer for console rendering
+    public static Action Tick { get; set; } // Called every frame
     public static int TargetFramerate { get; set; } = 30;
-    public static float TimeScale { get; set; } = 1f;
+    public static float TimeScale { get; set; } = 1f; // Global speed modifier (slow down/speed up time)
 
     private static float _deltaTime;
-    public static float DeltaTime => _deltaTime * TimeScale;
+    public static float DeltaTime => _deltaTime * TimeScale; // Time since last frame
 
     public static void Init()
     {
@@ -44,8 +44,7 @@ public static class Engine
 
 #if DEBUG
             string framerateString = ((int)(1f / DeltaTime)).ToString();
-            for (int i = 0; i < framerateString.Length; i++)
-                RenderBuffer.SetCharacter(RenderBuffer.Width - framerateString.Length + i, RenderBuffer.Height - 1, framerateString[i]);
+            RenderBuffer.PrintString(RenderBuffer.Width - framerateString.Length - 1, RenderBuffer.Height - 1, framerateString);
 # endif
         }
     }

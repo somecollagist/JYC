@@ -8,15 +8,15 @@ public struct PhysicsSystem : ISystem
 
     public void Init(EcsWorld world)
     {
-        _staticFilter = world.CreateFilter()
+        _staticFilter = world.CreateFilter() // Collision but no movement (terrain/buildings)
             .Require<PositionComponent>()
             .Require<Collider2DComponent>();
 
-        _kinematicFilter = world.CreateFilter()
+        _kinematicFilter = world.CreateFilter() // Movement but no collision (e.g. camera or particle effects)
             .Require<PositionComponent>()
             .Require<VelocityComponent>();
 
-        _dynamicFilter = world.CreateFilter()
+        _dynamicFilter = world.CreateFilter() // Movement and collision (full physics)
             .Require<PositionComponent>()
             .Require<VelocityComponent>()
             .Require<Collider2DComponent>();
@@ -24,8 +24,9 @@ public struct PhysicsSystem : ISystem
 
     public void Execute()
     {
-        NarrowPhase();
+        NarrowPhase(); // Handle collision
 
+        // Update position and rotation based on velocity
         foreach (var entity in _kinematicFilter.Matches().Concat(_dynamicFilter.Matches()))
         {
             ref var position = ref entity.Get<PositionComponent>().position;
@@ -46,6 +47,7 @@ public struct PhysicsSystem : ISystem
         }
     }
 
+    // Quickly and efficiently filter down to a list of possible collisions (simple distance check)
     private IEnumerable<(Entity a, Entity b)> BroadPhase()
     {
         // Process collisions only on dynamic bodies.
@@ -80,9 +82,10 @@ public struct PhysicsSystem : ISystem
         }
     }
 
+    // Process accurate collisions on objects
     private void NarrowPhase()
     {
-        foreach ((Entity a, Entity b) in BroadPhase())
+        foreach ((Entity a, Entity b) in BroadPhase()) // Get possible collisions
         {
             ref var aPosition = ref a.Get<PositionComponent>().position;
             ref var aVelocityComponent = ref a.Get<VelocityComponent>();
@@ -99,7 +102,7 @@ public struct PhysicsSystem : ISystem
             int i = 0;
             do
             {
-                if (isDynamic)
+                if (isDynamic) // Both are dynamic
                 {
                     var bVelocityComponent = b.Get<VelocityComponent>();
                     var bVelocity = bVelocityComponent.velocity;
@@ -109,7 +112,7 @@ public struct PhysicsSystem : ISystem
                         aPosition, aVelocity, aAngularVelocity, aCollider,
                         bPosition, bVelocity, bAngularVelocity, bCollider);
                 }
-                else
+                else // A is dynamic
                 {
                     hitInfo = GetHitPoint(
                         aPosition, aVelocity, aAngularVelocity, aCollider,
@@ -133,7 +136,7 @@ public struct PhysicsSystem : ISystem
                     }
                 }
                 i++;
-            } while (hitInfo.hit && i < 50);
+            } while (hitInfo.hit && i < 50); // Resolve until no more collisions, or collision limit reached
         }
     }
 
@@ -142,6 +145,7 @@ public struct PhysicsSystem : ISystem
         return position + (p + velocity * Engine.DeltaTime).Rotate(angularVelocity * Engine.DeltaTime);
     }
 
+    // Line to line intersection algorithm with velocity prediction and rotation. Also returns data about normal to surface and hit position
     HitInfo GetHitPoint(Vector2 aPosition, Vector2 aVelocity, float aAngularVelocity, Collider2DComponent aCollider, Vector2 bPosition, Vector2 bVelocity, float bAngularVelocity, Collider2DComponent bCollider)
     {
         bool hit = false;
@@ -175,7 +179,7 @@ public struct PhysicsSystem : ISystem
         return new HitInfo()
         {
             hit = hit,
-            point = nearestPoint,
+            point = nearestPoint, // Not necessarily the correct point, but as good as possible for discrete collision
             normal = normal
         };
     }
@@ -187,6 +191,7 @@ public struct PhysicsSystem : ISystem
         public Vector2 normal;
     }
 
+    // Line to line intersection detection
     (bool hit, Vector2 point) LineTest(Vector2 start1, Vector2 end1, Vector2 start2, Vector2 end2)
     {
         var a = start1;

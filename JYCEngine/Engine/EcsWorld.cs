@@ -25,12 +25,20 @@ public class EcsWorld
         _componentDependencyTable = new();
     }
 
+    /// <summary>
+    /// Update all filters at once
+    /// </summary>
+    /// <param name="entity">The entity that has changed</param>
     public void UpdateFilters(Entity entity)
     {
         foreach (var filter in Filters)
             filter.Update(entity);
     }
 
+    /// <summary>
+    /// Create a new entity
+    /// </summary>
+    /// <returns>The created entity</returns>
     public Entity CreateEntity()
     {
         int id = Entities.Reserve();
@@ -46,6 +54,11 @@ public class EcsWorld
         return entity;
     }
 
+    /// <summary>
+    /// Copy an entity and all of its components
+    /// </summary>
+    /// <param name="original">The original to make a copy of</param>
+    /// <returns>The new copy</returns>
     public Entity CopyEntity(Entity original)
     {
         Entity entity = CreateEntity();
@@ -58,6 +71,10 @@ public class EcsWorld
         return entity;
     }
 
+    /// <summary>
+    /// Create a filter
+    /// </summary>
+    /// <returns>The created filter</returns>
     public Filter CreateFilter()
     {
         Filter filter = new Filter(this);
@@ -65,6 +82,13 @@ public class EcsWorld
         return filter;
     }
 
+    /// <summary>
+    /// Destroy an entity
+    /// </summary>
+    /// <param name="entity">The entity to destroy</param>
+    /// <remarks>
+    /// The entity isn't actually destroyed; it is just marked for re-use along with all of its components
+    /// </remarks>
     public void DestroyEntity(Entity entity)
     {
         foreach (var component in entity.Components)
@@ -74,11 +98,27 @@ public class EcsWorld
         Entities.Recycle(entity.ID);
     }
 
+    /// <summary>
+    /// Destroy a component
+    /// </summary>
+    /// <param name="type">The type of component to destroy</param>
+    /// <param name="id">The id of the component to destroy</param>
     public void DestroyComponent(Type type, int id)
     {
         ComponentPools[type].Recycle(id);
     }
 
+    /// <summary>
+    /// Add a component to an entity
+    /// </summary>
+    /// <typeparam name="T">The type of the component</typeparam>
+    /// <param name="entity">The target entity</param>
+    /// <param name="component">The component to add</param>
+    /// <remarks>
+    /// When processing the [RequireComponents] attribute, System.Reflection is used
+    /// to dynamically build and call generics from a System.Type variable at runtime.
+    /// This is not ideal for performance, so this could possible be improved in the future
+    /// </remarks>
     public void AddComponentToEntity<T>(Entity entity, T component)
     {
         int id = ComponentPools[typeof(T)].Reserve();
@@ -100,6 +140,10 @@ public class EcsWorld
         UpdateFilters(entity);
     }
 
+    /// <summary>
+    /// Register a new (unseen) component type
+    /// </summary>
+    /// <typeparam name="T">The type to register</typeparam>
     public void RegisterNewComponent<T>()
     {
         ComponentPools.Add(typeof(T), new Pool<T>());
@@ -111,6 +155,12 @@ public class EcsWorld
             _componentDependencyTable.Add(typeof(T), new Type[0]); // Empty array
     }
 
+    /// <summary>
+    /// Internal helper method for creating a generic method given a type
+    /// </summary>
+    /// <param name="info">The base method</param>
+    /// <param name="type">The type argument</param>
+    /// <returns></returns>
     MethodInfo CreateGeneric(MethodInfo info, Type type)
     {
         return info.MakeGenericMethod(type);

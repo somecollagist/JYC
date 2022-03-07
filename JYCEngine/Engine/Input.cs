@@ -1,5 +1,6 @@
 ﻿namespace JYCEngine;
 
+// Temporary(ish). A keyboard hook should really be used in the future
 public static class Input
 {
     private static Action<ConsoleKeyInfo> _keyPressedCallback;

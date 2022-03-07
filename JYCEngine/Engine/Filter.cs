@@ -1,11 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿namespace JYCEngine;
 
-namespace JYCEngine;
-
+/// <summary>
+/// A class for filtering entities
+/// </summary>
 public class Filter
 {
     private EcsWorld _world;
@@ -25,6 +22,13 @@ public class Filter
         _matches = new();
     }
 
+    /// <summary>
+    /// Update the filter for an entity
+    /// </summary>
+    /// <param name="entity">The entity to update</param>
+    /// <remarks>
+    /// Filters are updated per entity, whenever a change/update is made to any of the entity's components
+    /// </remarks>
     public void Update(Entity entity)
     {
         int requireCount = 0;
@@ -51,18 +55,33 @@ public class Filter
         _matches.Add(entity.ID);
     }
 
+    /// <summary>
+    /// Fancy IEnumerable getter for the filter's results
+    /// Can be used in a foreach loop
+    /// </summary>
+    /// <returns></returns>
     public IEnumerable<Entity> Matches()
     {
         foreach (var match in _matches)
             yield return _world.Entities.Get(match);
     }
 
+    /// <summary>
+    /// Add a requirement for a component (whitelist)
+    /// </summary>
+    /// <typeparam name="T">The required type</typeparam>
+    /// <returns></returns>
     public Filter Require<T>()
     {
         _require.Add(typeof(T));
         return this;
     }
 
+    /// <summary>
+    /// Add an exclusion for a component (blacklist)
+    /// </summary>
+    /// <typeparam name="T">The excluded type</typeparam>
+    /// <returns></returns>
     public Filter Exclude<T>()
     {
         _exclude.Add(typeof(T));
