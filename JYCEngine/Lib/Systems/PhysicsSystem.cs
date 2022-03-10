@@ -149,7 +149,6 @@ public struct PhysicsSystem : ISystem
     HitInfo GetHitPoint(Vector2 aPosition, Vector2 aVelocity, float aAngularVelocity, Collider2DComponent aCollider, Vector2 bPosition, Vector2 bVelocity, float bAngularVelocity, Collider2DComponent bCollider)
     {
         bool hit = false;
-        float angle = 0f;
         float nearestSqrDistance = float.MaxValue;
         Vector2 nearestPoint = Vector2.Zero;
         Vector2 normal = Vector2.Zero;
@@ -161,16 +160,16 @@ public struct PhysicsSystem : ISystem
             {
                 Vector2 startB = GetPointAfterStep(bCollider.points[j], bPosition, bVelocity, bAngularVelocity);
                 Vector2 endB = GetPointAfterStep(bCollider.points[(j + 1) % bCollider.points.Count], bPosition, bVelocity, bAngularVelocity);
-                (bool lineHit, Vector2 point) = LineTest(startA, endA, startB, endB);
-                if (lineHit)
+                var result = Physics2D.LineLineIntersection(startA, endA, startB, endB);
+                if (result.IsSome(out var hitData))
                 {
-                    float sqrDistance = (point - aPosition).SqrMagnitude();
+                    float sqrDistance = (hitData.point - aPosition).SqrMagnitude();
                     if (sqrDistance < nearestSqrDistance)
                     {
                         nearestSqrDistance = sqrDistance;
-                        nearestPoint = point;
+                        nearestPoint = hitData.point;
                         hit = true;
-                        normal = (startB - endB).Normal().Normalize();
+                        normal = hitData.normal;
                         if (normal.Dot(startB - endB) != ((startB + endB) * 0.5f - aPosition).Dot(startB - endB)) normal = -normal;
                     }
                 }
@@ -190,19 +189,4 @@ public struct PhysicsSystem : ISystem
         public Vector2 point;
         public Vector2 normal;
     }
-
-    // Line to line intersection detection
-    (bool hit, Vector2 point) LineTest(Vector2 start1, Vector2 end1, Vector2 start2, Vector2 end2)
-    {
-        var a = start1;
-        var b = end1 - start1;
-        var c = start2;
-        var d = end2 - start2;
-
-        var m = (c - a).Cross(b) / b.Cross(d);
-        var l = (a - c).Cross(d) / d.Cross(b);
-
-        return (0 <= l && l <= 1 && 0 <= m && m <= 1, a + b * m);
-    }
-
 }

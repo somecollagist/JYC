@@ -1,0 +1,16 @@
+{
+  "Version": 1,
+  "ProjectMap": {
+    "496956c3-c7cc-42ea-8764-0f05222774cb": {
+      "ProjectGuid": "496956c3-c7cc-42ea-8764-0f05222774cb",
+      "DisplayName": "JYCEngine",
+      "ColorIndex": 0
+    },
+    "f28f5443-e482-4680-a828-d72ea272dc4b": {
+      "ProjectGuid": "f28f5443-e482-4680-a828-d72ea272dc4b",
+      "DisplayName": "ExampleProgram",
+      "ColorIndex": 1
+    }
+  },
+  "NextColorIndex": 2
+}
