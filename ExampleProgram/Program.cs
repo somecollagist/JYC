@@ -1,6 +1,11 @@
 ﻿using JYCEngine;
 using JYCEngine.StdLib;
 
+
+Input.Init();
+while (true) { }
+return;
+
 // Settings
 Engine.TargetFramerate = 60;
 
@@ -21,10 +26,8 @@ var camera = world.CreateEntity() // Create camera
     .Replace(new VelocityComponent());
 
 // Add (very poorly coded) input bindings to move the camera
-Input.RegisterBinding('w', () => camera.Get<VelocityComponent>().velocity += Vector2.Up * 1f);
-Input.RegisterBinding('a', () => camera.Get<VelocityComponent>().velocity += Vector2.Left * 1f);
-Input.RegisterBinding('s', () => camera.Get<VelocityComponent>().velocity += Vector2.Down * 1f);
-Input.RegisterBinding('d', () => camera.Get<VelocityComponent>().velocity += Vector2.Right * 1f);
+Input.Init();
+
 
 // Some shapes
 var triangle = new List<Vector2>() { new Vector2(-1, 0), new Vector2(1, 1), new Vector2(1, -1) };

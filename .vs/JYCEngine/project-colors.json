@@ -10,7 +10,12 @@
       "ProjectGuid": "f28f5443-e482-4680-a828-d72ea272dc4b",
       "DisplayName": "ExampleProgram",
       "ColorIndex": 1
+    },
+    "d368e6c3-8944-4a9f-a00b-b01f67ae21fa": {
+      "ProjectGuid": "d368e6c3-8944-4a9f-a00b-b01f67ae21fa",
+      "DisplayName": "ExampleProgram",
+      "ColorIndex": 2
     }
   },
-  "NextColorIndex": 2
+  "NextColorIndex": 3
 }

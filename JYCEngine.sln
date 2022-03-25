@@ -5,7 +5,7 @@ VisualStudioVersion = 17.1.32210.238
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JYCEngine", "JYCEngine\JYCEngine.csproj", "{496956C3-C7CC-42EA-8764-0F05222774CB}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ExampleProgram", "ExampleProgram\ExampleProgram.csproj", "{F28F5443-E482-4680-A828-D72EA272DC4B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ExampleProgram", "ExampleProgram\ExampleProgram.csproj", "{D368E6C3-8944-4A9F-A00B-B01F67AE21FA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -17,10 +17,10 @@ Global
 		{496956C3-C7CC-42EA-8764-0F05222774CB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{496956C3-C7CC-42EA-8764-0F05222774CB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{496956C3-C7CC-42EA-8764-0F05222774CB}.Release|Any CPU.Build.0 = Release|Any CPU
-		{F28F5443-E482-4680-A828-D72EA272DC4B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{F28F5443-E482-4680-A828-D72EA272DC4B}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{F28F5443-E482-4680-A828-D72EA272DC4B}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{F28F5443-E482-4680-A828-D72EA272DC4B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D368E6C3-8944-4A9F-A00B-B01F67AE21FA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D368E6C3-8944-4A9F-A00B-B01F67AE21FA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D368E6C3-8944-4A9F-A00B-B01F67AE21FA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D368E6C3-8944-4A9F-A00B-B01F67AE21FA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

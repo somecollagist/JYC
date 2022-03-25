@@ -32,7 +32,6 @@ public static class Engine
         {
             long time = Stopwatch.GetTimestamp();
 
-            Input.Run();
             Tick?.Invoke();
 
             float frametime = (float)(Stopwatch.GetTimestamp() - time) / Stopwatch.Frequency;

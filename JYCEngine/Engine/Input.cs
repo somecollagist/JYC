@@ -1,36 +1,63 @@
-﻿namespace JYCEngine;
+﻿using System.Diagnostics;
+using System.Runtime.InteropServices;
+
+namespace JYCEngine;
 
 // Temporary(ish). A keyboard hook should really be used in the future
 public static class Input
 {
-    private static Action<ConsoleKeyInfo> _keyPressedCallback;
-    private static Dictionary<char, Action> _bindings = new();
+    private const int WH_KEYBOARD_LL = 13;
+    private const int WM_KEYDOWN = 0x0100;
+    private static LowLevelKeyboardProc _proc = HookCallback;
+    private static IntPtr _hookID = IntPtr.Zero;
 
-    public static void RegisterBinding(char key, Action action)
+    public static void Init()
     {
-        _bindings.Add(key, action);
+        _hookID = SetHook(_proc);
     }
 
-    public static void Run()
+    public static void Dispose()
     {
-        var keys = GetInput();
+        UnhookWindowsHookEx(_hookID);
+    }
 
-        foreach (var key in keys)
+    private static IntPtr SetHook(LowLevelKeyboardProc proc)
+    {
+        using (Process curProcess = Process.GetCurrentProcess())
+        using (ProcessModule curModule = curProcess.MainModule)
         {
-            _keyPressedCallback?.Invoke(key);
-            if (_bindings.ContainsKey(key.KeyChar))
-                _bindings[key.KeyChar]?.Invoke();
+            return SetWindowsHookEx(WH_KEYBOARD_LL, proc,
+                GetModuleHandle(curModule.ModuleName), 0);
         }
     }
 
-    public static IEnumerable<ConsoleKeyInfo> GetInput()
+    private delegate IntPtr LowLevelKeyboardProc(
+        int nCode, IntPtr wParam, IntPtr lParam);
+
+    private static IntPtr HookCallback(
+        int nCode, IntPtr wParam, IntPtr lParam)
     {
-        var input = new HashSet<ConsoleKeyInfo>();
-        while (Console.KeyAvailable)
+        if (nCode >= 0 && wParam == (IntPtr)WM_KEYDOWN)
         {
-            var key = Console.ReadKey(true);
-            input.Add(key);
+            int vkCode = Marshal.ReadInt32(lParam);
+            Console.WriteLine(vkCode);
         }
-        return input;
+        return CallNextHookEx(_hookID, nCode, wParam, lParam);
     }
+
+    [DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
+    private static extern IntPtr SetWindowsHookEx(int idHook,
+        LowLevelKeyboardProc lpfn, IntPtr hMod, uint dwThreadId);
+
+    [DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    private static extern bool UnhookWindowsHookEx(IntPtr hhk);
+
+    [DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
+    private static extern IntPtr CallNextHookEx(IntPtr hhk, int nCode,
+        IntPtr wParam, IntPtr lParam);
+
+    [DllImport("kernel32.dll", CharSet = CharSet.Auto, SetLastError = true)]
+    private static extern IntPtr GetModuleHandle(string lpModuleName);
+
 }
